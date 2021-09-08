@@ -7,6 +7,7 @@ import AddContact from './AddContact'
 import ContactList from './ContactList'
 import ContactDetails from './ContactDetail'
 import api from '../api/contacts'
+import EditContact from './EditContact'
 function App() {
   const LOCAL_STORAGE_KEY = 'contacts'
   const [contacts, setContacts] = useState([])
@@ -21,6 +22,16 @@ function App() {
     const response = await api.post('/contacts', request)
     if (response) setContacts([...contacts, response.data])
     // console.log(response)
+  }
+
+  const updateContactHandler = async (contact) => {
+    const response = await api.put(`/contacts/${contact.id}`, contact)
+    const { id } = response.data
+    setContacts(
+      contacts.map((contact) => {
+        return contact.id === id ? { ...response.data } : contact
+      })
+    )
   }
 
   //Retrive contacts from axois
@@ -80,6 +91,15 @@ function App() {
           <Route
             path='/contact/:id'
             render={(props) => <ContactDetails {...props} />}
+          />
+          <Route
+            path='/edit'
+            render={(props) => (
+              <EditContact
+                {...props}
+                updateContactHandler={updateContactHandler}
+              />
+            )}
           />
         </Switch>
       </Router>
